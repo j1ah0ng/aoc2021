@@ -1,4 +1,4 @@
-import os
+import numpy as np
 import sys
 
 def rates(bitstrings: list[str]) -> int:
@@ -25,11 +25,46 @@ def rates(bitstrings: list[str]) -> int:
         else:
             epsilon += "0"
             gamma += "1"
-    print("epsilon: %s" % epsilon)
-    print("gamma: %s" % gamma)
     epsilon = int(epsilon, 2)
     gamma = int(gamma, 2)
     return gamma * epsilon
+
+def rates2(bitstrings: list[str]) -> int:
+    n_bits = len(bitstrings[0]) - 1
+    data = np.array(
+        [[int(x) for x in line[:-1]] for line in [list(s) for s in bitstrings]],
+        dtype=int,
+    )
+    least = data
+    most = np.copy(data)
+
+    lo = 0
+    hi = 0
+
+    # find the least common
+    for place in range(n_bits):
+        ones  = np.sum(least[:, place] == 1)
+        zeros = np.sum(least[:, place] == 0)
+        if ones < zeros:
+            least = least[least[:, place] == 1]
+        else:
+            least = least[least[:, place] == 0]
+        if len(least) == 1:
+            lo = int("".join([str(x) for x in least[0].tolist()]), 2)
+            break
+    # then the most common
+    for place in range(n_bits):
+        ones  = np.sum(most[:, place] == 1)
+        zeros = np.sum(most[:, place] == 0)
+        if ones < zeros:
+            most = most[most[:, place] == 0]
+        else:
+            most = most[most[:, place] == 1]
+        if len(most) == 1:
+            hi = int("".join([str(x) for x in most[0].tolist()]), 2)
+            break
+
+    return lo * hi
 
 if __name__ == "__main__":
     bitstrings = []
@@ -37,3 +72,4 @@ if __name__ == "__main__":
         for line in file:
             bitstrings.append(line)
     print(rates(bitstrings))
+    print(rates2(bitstrings))
