@@ -8,12 +8,12 @@ def leastFuelOptimMedian(positions: np.ndarray) -> int:
 
 def leastFuelOptimSquares(positions: np.ndarray) -> int:
     # discreteness sux
-    center = np.floor(np.mean(positions))
-    delta  = np.abs(positions - center)
-    c1 = int(np.sum((delta + 1) * (delta / 2)))
-    center = np.ceil(np.mean(positions))
-    delta  = np.abs(positions - center)
-    c2 = int(np.sum((delta + 1) * (delta / 2)))
+    def getFuelWithRoundFn(fn):
+        center = fn(np.mean(positions))
+        delta  = np.abs(positions - center)
+        return int(np.sum((delta + 1) * (delta / 2)))
+    c1 = getFuelWithRoundFn(np.ceil)
+    c2 = getFuelWithRoundFn(np.floor)
     return min(c1, c2)
 
 
