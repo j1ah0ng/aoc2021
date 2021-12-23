@@ -42,20 +42,26 @@ def getNeighbours(p: [int, int], r: int, c: int) -> list[[int, int]]:
             ]
     return neighbours
 
+# find size of basin containing point
 def saliency(seafloor: list[list[int]], point: [int, int]) -> int:
+    # boilerplate
     r = len(seafloor)
     c = len(seafloor[0])
     basin = [point]
 
+    # criterion for whether we include a point in buf
     def ok(p: [int, int]) -> bool:
         non_max = seafloor[p[0]][p[1]] != 9
         not_basin = not p in basin
         return non_max and not_basin
 
+    # list of points that are in the basin composed of the edges of
+    # the currently salient points in the basin filtered by criterion
     buf = list(filter(ok, getNeighbours(point, r, c)))
 
+    # while there are still more points to add, add them
     while len(buf) != 0:
-        basin.extend(buf)       # Buf contains the non-9 pts from last iter
+        basin.extend(buf)
         new_neighbours = []
         for pt in buf:
             new_neighbours.extend(getNeighbours(pt, r, c))
@@ -65,6 +71,7 @@ def saliency(seafloor: list[list[int]], point: [int, int]) -> int:
     # found basin
     return len(basin)
 
+# return the low points, which are in bijective corr. with basins
 def getReprPts(seafloor: list[list[int]]) -> list[[int, int]]:
     basin_pts = []
     r = len(seafloor)
